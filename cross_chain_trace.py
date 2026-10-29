@@ -17,15 +17,15 @@ from typing import Dict, List, Optional, Set
 
 CHAINS = {
     "ethereum": {
-        "rpc": "https://eth.llamarpc.com",
+        "rpc": "https://eth.drpc.org",
         "explorer": "https://etherscan.io",
-        "explorer_api": "https://api.etherscan.io/api",  # Needs API key
+        "explorer_api": "https://api.etherscan.io/api",
         "chain_id": 1,
         "layerzero_eid": 30101,
         "stargate_chain_id": 101,
     },
     "bsc": {
-        "rpc": "https://bsc-dataseed1.binance.org",
+        "rpc": "https://bsc.drpc.org",
         "explorer": "https://bscscan.com",
         "explorer_api": "https://api.bscscan.com/api",
         "chain_id": 56,
@@ -33,7 +33,7 @@ CHAINS = {
         "stargate_chain_id": 102,
     },
     "arbitrum": {
-        "rpc": "https://arb1.arbitrum.io/rpc",
+        "rpc": "https://arb1.drpc.org",
         "explorer": "https://arbiscan.io",
         "explorer_api": "https://api.arbiscan.io/api",
         "chain_id": 42161,
@@ -41,7 +41,7 @@ CHAINS = {
         "stargate_chain_id": 110,
     },
     "polygon": {
-        "rpc": "https://polygon-rpc.com",
+        "rpc": "https://polygon.drpc.org",
         "explorer": "https://polygonscan.com",
         "explorer_api": "https://api.polygonscan.com/api",
         "chain_id": 137,
@@ -49,7 +49,7 @@ CHAINS = {
         "stargate_chain_id": 109,
     },
     "optimism": {
-        "rpc": "https://mainnet.optimism.io",
+        "rpc": "https://optimism.drpc.org",
         "explorer": "https://optimistic.etherscan.io",
         "explorer_api": "https://api-optimistic.etherscan.io/api",
         "chain_id": 10,
@@ -57,7 +57,7 @@ CHAINS = {
         "stargate_chain_id": 111,
     },
     "base": {
-        "rpc": "https://mainnet.base.org",
+        "rpc": "https://base.drpc.org",
         "explorer": "https://basescan.org",
         "explorer_api": "https://api.basescan.org/api",
         "chain_id": 8453,
@@ -69,9 +69,9 @@ CHAINS = {
 # Source addresses to trace from
 SOURCE_ADDRESSES = {
     "ethereum": [
-        "0x5227...CB2f8c",  # Exploiter 2 - primary receiver
-        "0x8532...43D4",    # Exploiter 3 - ETH holder
-        "0x7C86...5CA0",    # Attacker EOA
+        "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c",  # Exploiter 2 - primary receiver
+        "0x8532...43D4",    # Exploiter 3 - ETH holder (NEED FULL ADDRESS)
+        "0x7c8601d4645b93cea45f71e118a729332e6b5ca0",  # Attacker EOA
     ],
     "bsc": [],
     "arbitrum": [],

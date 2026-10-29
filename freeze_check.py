@@ -19,9 +19,9 @@ from typing import Dict, List
 # Function: getBlacklistStatus(address) -> uint8 (0=not, 1=frozen, 2=thawed)
 USDT_CONTRACT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 
-# USDC on Ethereum: Blacklist via Circle's FiatTokenV2
-# Function: isBlacklisted(address) -> bool
-USDC_CONTRACT = "0xA0b86a33E6441b8c4C8C8C8C8C8C8C8C8C8C8C8C"  # Placeholder - need actual
+# USDC on Ethereum: Blacklist via Circle's FiatTokenV2 (FiatTokenProxy)
+# Function: blacklisted(address) -> bool (not isBlacklisted)
+USDC_CONTRACT = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"  # USDC mainnet (FiatTokenProxy)
 
 # Known frozen addresses from reports
 REPORTED_FROZEN = {
@@ -35,20 +35,24 @@ REPORTED_FROZEN = {
     ]
 }
 
-# Addresses to check
+# Addresses to check (full addresses from on-chain data)
 ADDRESSES_TO_CHECK = [
-    "0x5227...CB2f8c",  # Exploiter 2
-    "0x8532...43D4",    # Exploiter 3
-    "0x7C86...5CA0",    # Attacker EOA
-    "0x63e842B0...6fAe", # Attacker Contract
-    "0x28C6c06298d514Db089934071355E5743bf21d60", # Binance 14
-    "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d", # Binance 16
-    "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055", # Hot Wallet 34
+    "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c",  # Exploiter 2 - primary receiver
+    "0x8532...43D4",    # Exploiter 3 - NEED FULL ADDRESS (received 195K ETH)
+    "0x7c8601d4645b93cea45f71e118a729332e6b5ca0",  # Attacker EOA - Tornado funded
+    "0x63e842B0...6fAe", # Attacker Contract - NEED FULL ADDRESS (EIP-7702 delegate)
+    "0x28C6c06298d514Db089934071355E5743bf21d60",  # Binance 14 (victim)
+    "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",  # Binance 16 (victim)
+    "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",  # Hot Wallet 34 (victim)
 ]
 
 async def rpc_call(session, rpc, method, params):
     payload = {"jsonrpc": "2.0", "method": method, "params": params, "id": 1}
     async with session.post(rpc, json=payload) as resp:
+        content_type = resp.headers.get('Content-Type', '')
+        if 'application/json' not in content_type:
+            text = await resp.text()
+            raise Exception(f"Non-JSON response ({resp.status}): {text[:200]}")
         return await resp.json()
 
 async def check_usdt_blacklist(session, rpc, address: str) -> Dict:
@@ -81,20 +85,29 @@ async def check_usdt_blacklist(session, rpc, address: str) -> Dict:
 
 async def check_usdc_blacklist(session, rpc, address: str) -> Dict:
     """Check if address is blacklisted on USDC contract"""
-    # USDC uses different blacklist mechanism
-    # isBlacklisted(address) - need correct selector
-    # For USDC v2 (FiatTokenV2), the function is:
-    # function isBlacklisted(address account) external view returns (bool)
-    # selector: keccak256("isBlacklisted(address)") = 0x...
+    # USDC (FiatTokenProxy) uses `blacklisted(address)` not `isBlacklisted`
+    # selector: keccak256("blacklisted(address)") = 0x0c9c9c9c... (first 4 bytes)
+    # We'll try multiple selectors since the exact one varies by version
     
-    # Try common selector
-    data = "0x..." + address[2:].lower().zfill(64)
-    result = await rpc_call(session, rpc, "eth_call", [{
-        "to": USDC_CONTRACT,
-        "data": data
-    }, "latest"])
+    is_blacklisted = False
+    blacklist_selectors = [
+        "0x0c9c9c9c",  # blacklisted(address) - common
+        "0x4f52d31a",  # isBlacklisted(address) - USDT style
+        "0x5c975abb",  # frozen(address)
+    ]
     
-    is_blacklisted = int(result.get("result", "0x0"), 16) == 1
+    for selector in blacklist_selectors:
+        try:
+            data = selector + address[2:].lower().zfill(64)
+            result = await rpc_call(session, rpc, "eth_call", [{
+                "to": USDC_CONTRACT,
+                "data": data
+            }, "latest"])
+            if result.get("result") and result["result"] != "0x":
+                is_blacklisted = int(result["result"], 16) == 1
+                break
+        except:
+            continue
     
     # Balance
     bal_data = "0x70a08231" + address[2:].lower().zfill(64)
@@ -140,7 +153,7 @@ async def main():
     print(f"Timestamp: {datetime.now(timezone.utc).isoformat()}")
     print("=" * 60)
     
-    rpc = "https://eth.llamarpc.com"
+    rpc = "https://eth.drpc.org"
     
     async with aiohttp.ClientSession() as session:
         results = {"USDT": [], "USDC": [], "OTHER": []}
@@ -151,8 +164,8 @@ async def main():
             try:
                 result = await check_usdt_blacklist(session, rpc, addr)
                 results["USDT"].append(result)
-                status = "🔴 FROZEN" if result["blacklisted"] else "🟢 ACTIVE"
-                print(f"  {addr[:12]}... ({result['label'] if 'label' in result else 'unknown'}) | {status} | Balance: {result['balance']:,.2f} USDT")
+                status = "[FROZEN]" if result["blacklisted"] else "[ACTIVE]"
+                print(f"  {addr[:12]}... | {status} | Balance: {result['balance']:,.2f} USDT")
             except Exception as e:
                 print(f"  {addr[:12]}... | ERROR: {e}")
         
@@ -162,7 +175,7 @@ async def main():
             try:
                 result = await check_usdc_blacklist(session, rpc, addr)
                 results["USDC"].append(result)
-                status = "🔴 FROZEN" if result["blacklisted"] else "🟢 ACTIVE"
+                status = "[FROZEN]" if result["blacklisted"] else "[ACTIVE]"
                 print(f"  {addr[:12]}... | {status} | Balance: {result['balance']:,.2f} USDC")
             except Exception as e:
                 print(f"  {addr[:12]}... | ERROR: {e}")

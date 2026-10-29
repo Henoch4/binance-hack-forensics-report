@@ -7,6 +7,7 @@ Cross-references Binance hack addresses against known Lazarus IOCs
 import asyncio
 import aiohttp
 import json
+from datetime import datetime, timezone
 from typing import Dict, List, Set
 from dataclasses import dataclass
 
@@ -190,7 +191,7 @@ async def main():
     # Analyze attacker contract
     print("\n[3/4] Analyzing attacker contract...")
     async with aiohttp.ClientSession() as session:
-        rpc = "https://eth.llamarpc.com"
+        rpc = "https://eth.drpc.org"
         contract_analysis = await analyze_attacker_contract(session, rpc, "0x63e842B0...6fAe")
         print(f"    Contract analysis: {json.dumps(contract_analysis, indent=4)}")
         

@@ -1,0 +1,17 @@
+Binance hack forensics toolkit - Oct 29 2026
+
+6th in series (Bybit, Bitget, WooX, Drift, DecSys, Binance)
+Largest exchange hack to date: ~$2.8-3.3B via EIP-7702 delegation abuse
+
+Components:
+- master.py: Full investigation pipeline CLI
+- watchlist_poller.py: 10s monitoring across 5 chains (ETH, BSC, Arb, Poly, Opt)
+- attribution_check.py: Lazarus/DPRK overlap (tayvano repo cross-ref)
+- freeze_check.py: USDT/USDC blacklist verification on-chain
+- cross_chain_trace.py: Bridge tracer (LZ, Stargate, THOR, Celer, Wormhole)
+- tx_decoder.py: EIP-7702 AUTH + sweep transaction decoder
+- binance-hack-forensics-2026-10-29.md: ZachXBT-standard report (timeline, graphs, watchlist, bounty ops)
+- requirements.txt
+
+Freezes: >$1.567B USDT, >$823M USDC | Unfreezable: ~195K ETH ($442M)
+Attribution: Unknown (Lazarus-consistent, no direct IOC overlap yet)

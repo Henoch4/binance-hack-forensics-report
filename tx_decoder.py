@@ -48,11 +48,11 @@ ADDRESSES = {
 # ============================================================
 
 RPCS = {
-    "ethereum": "https://eth.llamarpc.com",
-    "bsc": "https://bsc-dataseed1.binance.org",
-    "arbitrum": "https://arb1.arbitrum.io/rpc",
-    "polygon": "https://polygon-rpc.com",
-    "optimism": "https://mainnet.optimism.io",
+    "ethereum": "https://eth.drpc.org",
+    "bsc": "https://bsc.drpc.org",
+    "arbitrum": "https://arb1.drpc.org",
+    "polygon": "https://polygon.drpc.org",
+    "optimism": "https://optimism.drpc.org",
 }
 
 # ============================================================

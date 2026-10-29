@@ -20,36 +20,36 @@ import hashlib
 
 WATCHLIST = {
     "ethereum": {
-        "rpc": "https://eth.llamarpc.com",  # Use your own RPC
+        "rpc": "https://eth.drpc.org",
         "addresses": {
             "0x8532...43D4": {"label": "Exploiter 3 (ETH)", "priority": "CRITICAL", "asset": "ETH"},
-            "0x5227...CB2f8c": {"label": "Exploiter 2 (Tokens)", "priority": "HIGH", "asset": "MULTI"},
-            "0x7C86...5CA0": {"label": "Attacker EOA", "priority": "MEDIUM", "asset": "ETH"},
+            "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c": {"label": "Exploiter 2 (Tokens)", "priority": "HIGH", "asset": "MULTI"},
+            "0x7c8601d4645b93cea45f71e118a729332e6b5ca0": {"label": "Attacker EOA", "priority": "MEDIUM", "asset": "ETH"},
             "0x63e842B0...6fAe": {"label": "Attacker Contract", "priority": "MEDIUM", "asset": "CONTRACT"},
             "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d": {"label": "Binance 16", "priority": "LOW", "asset": "ETH"},
             "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055": {"label": "Hot Wallet 34", "priority": "LOW", "asset": "MULTI"},
         }
     },
     "bsc": {
-        "rpc": "https://bsc-dataseed1.binance.org",
+        "rpc": "https://bsc.drpc.org",
         "addresses": {
             # Add Binance-labeled BSC addresses here
         }
     },
     "arbitrum": {
-        "rpc": "https://arb1.arbitrum.io/rpc",
+        "rpc": "https://arb1.drpc.org",
         "addresses": {
             # Add Binance-labeled Arbitrum addresses here
         }
     },
     "polygon": {
-        "rpc": "https://polygon-rpc.com",
+        "rpc": "https://polygon.drpc.org",
         "addresses": {
             "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055": {"label": "Hot Wallet 34 (Polygon)", "priority": "HIGH", "asset": "MULTI"},
         }
     },
     "optimism": {
-        "rpc": "https://mainnet.optimism.io",
+        "rpc": "https://optimism.drpc.org",
         "addresses": {
             # Add Binance-labeled Optimism addresses here
         }
