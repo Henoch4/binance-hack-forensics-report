@@ -31,6 +31,7 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 | **21:05+** | Freeze reports begin: Tether (971M→1.567B USDT), Circle (823M USDC) | CZ, Paolo Ardoino, Jeremy Allaire |
 | **21:15** | CZ: "does look like a hack on Binance" | X/Twitter |
 | **21:24** | Binance official: "actively investigating" | X/Twitter |
+| **21:30+** | Binance: Withdrawals paused, security checks underway | X/Twitter |
 
 ---
 
@@ -241,6 +242,44 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 | $2.8-3.3B total loss | **85%** | Varying reports ($2.53B-$3.3B), cross-chain not fully traced |
 | Lazarus/DPRK attribution | **30%** | Tornado + sophisticated + exchange target = consistent, but no direct overlap yet |
 | Insider vs external key theft | **Unknown** | Insufficient evidence; all 3 hypotheses viable |
+
+---
+
+## OFFICIAL CONFIRMATIONS (X/Twitter — 22:30-23:00 UTC)
+
+| Source | Statement | Timestamp (UTC) |
+|--------|-----------|-----------------|
+| **CZ (@cz_binance)** | "User funds are safe! It does look like a hack on Binance. Appreciate the quick freeze from Tether (~$971m) and Circle (~$823m). I don't manage Binance (.com) anymore, but as a shareholder, I expect all user funds will be fully covered." | ~21:15 |
+| **Binance (@binance)** | "Our teams are aware of reports of a potential security issue and are actively investigating... Withdrawals paused until resolved. User funds remain safe. Users should remain cautious of scams." | ~21:24, updated |
+| **Paolo Ardoino (@paoloardoino, Tether CEO)** | "Tether froze more than 1.567B USDT related to a potential Binance exchange hack." | ~21:25 |
+| **Circle (via CZ/Jeremy Allaire)** | ~$800-823M USDC frozen in coordination with law enforcement | ~21:18-21:25 |
+
+**Total frozen stablecoins**: ~$2.3-2.4B+ (USDT + USDC combined)
+
+---
+
+## MARKET IMPACT (X/Coinglass data)
+
+| Metric | Value |
+|--------|-------|
+| **1-hour liquidations** | ~$600-628M (97% longs) |
+| **BTC** | Dipped below $79K (-2-3%) |
+| **ETH** | -3-4% |
+| **BNB** | -6-9% (hardest hit top-10) |
+| **Primary liquidation venue** | Binance ($344M of 1-hour total) |
+
+---
+
+## ATTRIBUTION CHATTER (X — Unverified)
+
+| Theory | Proponents | Evidence |
+|--------|------------|----------|
+| **Lazarus/DPRK (North Korea)** | Spreek, multiple analysts | Tornado funding, exchange target, sophistication, Binance recently blocked NK social-engineering attempts (Oct 27) |
+| **Inside job / key compromise** | Various | Valid EIP-7702 signature from Binance 14; 50 delegations = pre-empted revocation |
+| **Signing system manipulation (Bybit-style)** | Analysts | Similar to Safe{Wallet} JS injection (Bybit Feb 2025) |
+| **No confirmation** | All | No on-chain IOC overlap with prior Lazarus incidents yet |
+
+**Status**: No confirmed attribution. Requires funding graph + Elliptic/TRM corroboration.
 
 ---
 
