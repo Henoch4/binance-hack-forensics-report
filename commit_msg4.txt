@@ -1,0 +1,11 @@
+Major update: Cross-chain confirmation, downstream movement, urgent delegation issue
+
+- Cross-chain: Arbitrum ~$19.5M, Avalanche ~$24M confirmed (Blockaid)
+- Aave froze lending markets to prevent borrowing
+- ~$900M+ moved downstream to 7+ wallets post-freeze
+- Tether blacklisted 7 downstream wallets (2 holding ~205M USDT each)
+- **URGENT**: Second sweep at 01:44 UTC (~200M USDT) - Binance 14 STILL DELEGATED
+- Ethereum total: $3.52B (Unchained), Multi-chain: $3.3-5.8B (Arkham/Blockaid/Grogan)
+- Updated all addresses with full forms from on-chain data
+- Updated watchlist: Exploiter 3 (0 txs out), Exploiter 2 (16 txs), delegation still active
+- Added urgent action: REVOKE EIP-7702 DELEGATION on Binance 14

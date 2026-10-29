@@ -1,19 +1,22 @@
 # BINANCE HACK FORENSICS REPORT
-## Incident: October 29, 2026 — Potential $2.8–3.3B Hot Wallet Drain via EIP-7702 Delegation Abuse
+## Incident: October 29–30, 2026 — Largest Exchange Hack in History via EIP-7702 Delegation Abuse
 **Status**: ACTIVE INVESTIGATION | **Classification**: CONFIRMED ON-CHAIN EXFILTRATION | **Attribution**: UNKNOWN (hypothesis: sophisticated actor, possible Lazarus/DPRK overlap)
+**Last Updated**: October 30, 2026 ~00:00 UTC
 
 ---
 
 ## EXECUTIVE SUMMARY
 
-At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchange hack in crypto history, draining **~$2.8–3.3 billion** from Binance hot wallets across **5 blockchains**. The attack leveraged **EIP-7702 delegation** — a feature live since the Pectra upgrade (May 7, 2025) — to seize control of Binance's "Binance 14" hot wallet via a signed delegation, then swept all assets in a single transaction.
+At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchange hack in crypto history, draining **~$2.5–5.8 billion** from Binance hot wallets across **7+ blockchains**. The attack leveraged **EIP-7702 delegation** — a feature live since the Pectra upgrade (May 7, 2025) — to seize control of Binance's "Binance 14" hot wallet via a signed delegation, then swept all assets in a single transaction.
 
 **Key differentiator from prior hacks**: The attacker held a valid EIP-7702 signature from Binance 14's private key, enabling delegation to an attacker-controlled contract. This implies either:
 1. **Private key theft** (hot wallet key compromised)
 2. **Signing system manipulation** (Bybit-style: tricked signing system into signing malicious delegation)
 3. **Insider access** (authorized signer complicit)
 
-**Freeze status**: Tether froze **>$1.567B USDT**; Circle froze **>$823M USDC**. Native ETH (~$442M) and non-freezable tokens remain at risk.
+**Freeze status**: Tether froze **>$1.567B USDT**; Circle froze **>$823M USDC**; Ripple RLUSD partially frozen. Native ETH (~$442M), BTC (~$45M), TRX, and non-freezable tokens remain at risk.
+
+**🚨 CRITICAL**: Binance 14 EIP-7702 delegation is **STILL ACTIVE** — second sweep confirmed at ~01:44 UTC. Binance 16 being drained in real-time (849 ETH → 0.21 ETH between 22:54–23:01 UTC).
 
 ---
 
@@ -22,21 +25,23 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 | Time | Event | Source |
 |------|-------|--------|
 | **Oct 28** | Attacker EOA `0x7c8601d4645b93cea45f71e118a729332e6b5ca0` receives 3× 0.1 ETH from Tornado Cash | Multiple |
-| **Oct 29 afternoon** | Attacker deploys contract `0x63e842B0...6fAe` | Cryptoticker |
+| **Oct 29 afternoon** | Attacker deploys sweeper contract `0x63e842B0...c6fAe` | Cryptoticker, Image |
 | **20:20:59** | EIP-7702 delegation tx: Binance 14 → attacker contract (50 delegations, nonce-protected) | Cryptoticker, Defimon |
-| **20:24:23** | **MAIN SWEEP #1**: Attacker contract calls `execute()` on Binance 14 → 167,464 ETH + 63 tokens to `0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c` | Etherscan, PANews |
-| **20:24:47** | Binance 16 sends 28,005.6 ETH to same address (24 sec later) | Cryptoticker |
-| **20:39** | 195,460 ETH forwarded from Exploiter 2 → Exploiter 3 (`0x8532fa14acaf483729c449b8458aeddb900543d4`) | PANews |
+| **20:24:23** | **MAIN SWEEP #1**: Attacker contract calls `execute()` on Binance 14 → 167,464 ETH + 1.615B USDT + 60+ tokens to `0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c` | Etherscan, PANews |
+| **20:24:47** | Binance 16 sends 28,005 ETH to same address (24 sec later) | Cryptoticker |
+| **20:39** | 195,460 ETH forwarded from Exploiter 2 → Exploiter 3 (`0x8532fa14acaf483729c449b8458aeddb900543d4`) | PANews, Image |
 | **20:41** | 780M USDC from Binance Hot Wallet 34 via same delegation route | PANews, Cryptoticker |
+| **20:45** | 43M additional USDC pulled from Binance smart account | Image |
 | **21:05+** | Freeze reports begin: Tether (971M→1.567B USDT), Circle (823M USDC) | CZ, Paolo Ardoino, Jeremy Allaire |
 | **21:15** | CZ: "does look like a hack on Binance" | X/Twitter |
 | **21:24** | Binance official: "actively investigating" | X/Twitter |
 | **21:30+** | Binance: Withdrawals paused, security checks underway | X/Twitter |
-| **21:44 (01:44 UTC)** | **SECOND SWEEP**: ~200M more USDT from Binance 14 (still delegated) | Unchained |
+| **01:44 UTC** | **SECOND SWEEP**: ~200M more USDT from Binance 14 (still delegated) | Unchained |
 | **22:00+** | Aave freezes lending markets; Tether blacklists 7 downstream wallets | The Block, Unchained |
 | **22:30+** | Arkham labels "binance-hacker-1029" cluster (~$5.84B) | Arkham |
 | **23:00+** | Cross-chain confirmed: Arbitrum ~$19.5M, Avalanche ~$24M | Blockaid |
-| **21:30+** | Binance: Withdrawals paused, security checks underway | X/Twitter |
+| **23:00+ (LIVE)** | **Binance 16 draining**: 849 ETH → 0.21 ETH in progress (delegation active) | Live poller |
+| **23:00+ (LIVE)** | Exploiter 2 at 20 txs, downstream movement ongoing | Live poller |
 
 ---
 
@@ -44,13 +49,13 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 
 | Label | Address | Role | Status |
 |-------|---------|------|--------|
-| **Binance 14** | `0x28C6c06298d514Db089934071355E5743bf21d60` | Victim hot wallet (drained, still delegated) | 129 ETH residual |
-| **Binance 16** | `0xDFd5293D8e347dFe59E90eFd55b2956a1343963d` | Victim hot wallet (28K ETH drained) | 849 ETH residual |
+| **Binance 14** | `0x28C6c06298d514Db089934071355E5743bf21d60` | Victim hot wallet (drained, **STILL DELEGATED**) | 0.96 ETH residual |
+| **Binance 16** | `0xDFd5293D8e347dFe59E90eFd55b2956a1343963d` | Victim hot wallet (28K ETH drained, **being swept live**) | 0.21 ETH residual |
 | **Hot Wallet 34** | `0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055` | Victim smart wallet (780M+ USDC drained) | 0.34 ETH residual |
-| **Attacker EOA** | `0x7c8601d4645b93cea45f71e118a729332e6b5ca0` | Tornado-funded trigger / delegation signer | 1.27 ETH, 16 txs |
-| **Attacker Contract** | `0x63e842B0...6fAe` | EIP-7702 delegate target (sweep logic) | ACTIVE |
-| **Exploiter 2** | `0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c` | Primary receiver ("Binance Hot Wallet Exploiter 2") | **1,175M USDT, 823M USDC, 2,076 ETH** |
-| **Exploiter 3** | `0x8532fa14acaf483729c449b8458aeddb900543d4` | ETH parking (195K ETH) | **195,460 ETH, 0 txs out** |
+| **Attacker EOA** | `0x7c8601d4645b93cea45f71e118a729332e6b5ca0` | Tornado-funded trigger / delegation signer | 1.18 ETH, 17 txs |
+| **Attacker Contract** | `0x63e842B0...c6fAe` | EIP-7702 delegate target (sweep logic) | ACTIVE |
+| **Exploiter 2** | `0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c` | Primary receiver ("Binance Hot Wallet Exploiter 2") | **1,175M USDT, 823M USDC, 2,075 ETH, 20 txs** |
+| **Exploiter 3** | `0x8532fa14acaf483729c449b8458aeddb900543d4` | ETH parking (195K ETH) | **195,460 ETH, 0 txs out — CRITICAL** |
 | **Downstream 1** | (TBD) | Tether-blacklisted (~205M USDT) | FROZEN |
 | **Downstream 2** | (TBD) | Tether-blacklisted (~205M USDT) | FROZEN |
 
@@ -61,14 +66,14 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 | Token | Amount | Est. Value | Freeze Status |
 |-------|--------|------------|---------------|
 | **USDT** | 1,615,409,499 | $1.615B | **FROZEN** (~1.567B primary + 205M downstream) |
-| **USDC** | 823,000,000 | $823M | **FROZEN** (~823M) |
+| **USDC** | 823,000,000 + 43M additional | $866M | **FROZEN** (~823M) |
 | **ETH** | 195,470 | $442M | **UNFREEZABLE** (Exploiter 3) |
 | **wBETH** | 29,934 | $74.6M | Check wBETH contract |
-| **RLUSD** | 62,597,240 | $62.6M | Check Ripple freeze capability |
+| **RLUSD** | 62,597,240 | $62.6M | Attacker hopped twice in 3 min to beat freeze — check Ripple |
 | **XAUt** | 11,372 | $45.6M | Check Tether Gold freeze |
-| **UNI** | 6,189,796 | $41.2M | Governance token - no freeze |
+| **UNI** | 6,189,796 | $41.2M | Split to new wallet (Whale Alert) |
 | **ENA** | 198,369,717 | $37.0M | Check Ethena freeze |
-| **PEPE** | 7.18 trillion | $35.3M | No freeze |
+| **PEPE** | 7.18 trillion | $35.3M | Split to new wallet (Whale Alert) |
 | **USD1** | 27,760,802 | $27.7M | Check World Liberty freeze |
 | **LINK** | 2,263,172 | $25.0M | No freeze |
 | **AAVE** | 127,853 | $16.2M | No freeze (Aave markets frozen) |
@@ -80,21 +85,24 @@ At **20:24:23 UTC on October 29, 2026**, an attacker executed the largest exchan
 
 ---
 
-## CROSS-CHAIN SCOPE (5 Blockchains Reported)
+## CROSS-CHAIN SCOPE (7+ Blockchains Confirmed)
 
 | Chain | Status | Known Outflows | Priority |
 |-------|--------|----------------|----------|
 | **Ethereum** | CONFIRMED | **$3.52B** (Unchained) | CRITICAL - trace active |
 | **Arbitrum** | CONFIRMED | **~$19.5M** (Blockaid) | HIGH - trace needed |
 | **Avalanche** | CONFIRMED | **~$24M** (Blockaid) | HIGH - trace needed |
+| **Optimism** | CONFIRMED | Reported (Arkham) | HIGH - trace needed |
 | **BSC (BNB Chain)** | REPORTED | Unknown - need BSCScan trace | HIGH |
 | **Polygon** | REPORTED | Hot Wallet 34 active on Polygon | HIGH |
-| **Optimism/Base** | REPORTED | Unknown - need trace | MEDIUM |
+| **Bitcoin** | REPORTED | ~18K BTC outflow (Image estimates) | HIGH - unfreezable |
+| **TRON** | REPORTED | Reported outflow (Image) | HIGH - unfreezable |
 
 **Action**: Deploy trace scripts on all chains for Binance-labeled addresses.
 
 **New: Aave froze lending markets** to prevent borrowing against stolen collateral.
 **New: Tether blacklisted 7 downstream wallets** (2 holding ~205M USDT combined).
+**New: Ripple RLUSD** — attacker hopped twice in 3 minutes to beat freeze; check Ripple freeze status.
 
 ---
 

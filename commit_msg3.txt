@@ -1,0 +1,10 @@
+Add X/Twitter official confirmations + market impact
+
+- CZ: 'does look like a hack', user funds covered
+- Binance: withdrawals paused, security checks underway
+- Paolo Ardoino (Tether): >1.567B USDT frozen
+- Circle: ~800-823M USDC frozen (law enforcement coordination)
+- Total frozen stables: ~$2.3-2.4B+
+- Market: ~$600M+ liquidations (1hr, 97% longs), BTC <$79k, BNB -6-9%
+- Attribution chatter: Lazarus/DPRK, inside job, key compromise - no confirmation
+- First flag: @spreekaway at ~20:32 UTC
