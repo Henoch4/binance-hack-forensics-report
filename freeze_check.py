@@ -132,7 +132,10 @@ async def check_token_balance(session, rpc, token_contract: str, address: str, d
         "to": token_contract,
         "data": data
     }, "latest"])
-    return int(result.get("result", "0x0"), 16) / (10 ** decimals)
+    hex_result = result.get("result", "0x0")
+    if hex_result == "0x" or not hex_result:
+        return 0.0
+    return int(hex_result, 16) / (10 ** decimals)
 
 # Token contracts for other stolen assets
 OTHER_TOKENS = {
@@ -147,6 +150,57 @@ OTHER_TOKENS = {
     "AAVE": ("0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9", 18),
 }
 
+# Aave V3 Ethereum Mainnet
+AAVE_LENDING_POOL = "0x87869991452208843334988248bDd9e514747e33"
+AAVE_USDT_ATOKEN = "0x8dc4C39555C7f19c77c9e07229d994C7e135B964"
+AAVE_USDC_ATOKEN = "0x9bA8DC8c31F8222b93587f4978e00504d7327F78"
+ALLOWANCE_SELECTOR = "0xdda051c1"
+GET_RESERVE_DATA_SELECTOR = "0x6d475d8c"
+
+async def get_aave_reserve_paused(session, rpc, token_contract: str):
+    """Check if Aave reserve is paused via getReserveData (bit 0 of configuration)"""
+    data = GET_RESERVE_DATA_SELECTOR + token_contract[2:].lower().zfill(64)
+    result = await rpc_call(session, rpc, "eth_call", [{
+        "to": AAVE_LENDING_POOL,
+        "data": data
+    }, "latest"])
+    hex_result = result.get("result", "0x")
+    if hex_result == "0x" or len(hex_result) < 130:
+        return None
+    configuration = int(hex_result[2:66], 16)
+    return bool(configuration & 1)
+
+async def check_aave_deposit(session, rpc, address: str):
+    """Check if address has deposited to Aave (aToken balance + allowance)"""
+    ausdt = await check_token_balance(session, rpc, AAVE_USDT_ATOKEN, address, 6)
+    ausdc = await check_token_balance(session, rpc, AAVE_USDC_ATOKEN, address, 6)
+    
+    # Allowance to LendingPool
+    data = ALLOWANCE_SELECTOR + address[2:].lower().zfill(64) + AAVE_LENDING_POOL[2:].lower().zfill(64)
+    usdt_allow_res = await rpc_call(session, rpc, "eth_call", [{
+        "to": USDT_CONTRACT,
+        "data": data
+    }, "latest"])
+    usdt_allow_hex = usdt_allow_res.get("result", "0x0")
+    usdt_allow = int(usdt_allow_hex, 16) if usdt_allow_hex not in ("0x", "") else 0
+    
+    data = ALLOWANCE_SELECTOR + address[2:].lower().zfill(64) + AAVE_LENDING_POOL[2:].lower().zfill(64)
+    usdc_allow_res = await rpc_call(session, rpc, "eth_call", [{
+        "to": USDC_CONTRACT,
+        "data": data
+    }, "latest"])
+    usdc_allow_hex = usdc_allow_res.get("result", "0x0")
+    usdc_allow = int(usdc_allow_hex, 16) if usdc_allow_hex not in ("0x", "") else 0
+    
+    return {
+        "aUSDT": ausdt,
+        "aUSDC": ausdc,
+        "usdt_allowance": usdt_allow,
+        "usdc_allowance": usdc_allow,
+        "deposited": ausdt > 0 or ausdc > 0,
+        "allowance_set": usdt_allow > 0 or usdc_allow > 0
+    }
+
 async def main():
     print("=" * 60)
     print("FREEZE VERIFICATION - BINANCE HACK STOLEN FUNDS")
@@ -159,7 +213,7 @@ async def main():
         results = {"USDT": [], "USDC": [], "OTHER": []}
         
         # Check USDT blacklist
-        print("\n[1/3] Checking USDT (Tether) blacklist...")
+        print("\n[1/4] Checking USDT (Tether) blacklist...")
         for addr in ADDRESSES_TO_CHECK:
             try:
                 result = await check_usdt_blacklist(session, rpc, addr)
@@ -170,7 +224,7 @@ async def main():
                 print(f"  {addr[:12]}... | ERROR: {e}")
         
         # Check USDC blacklist
-        print("\n[2/3] Checking USDC (Circle) blacklist...")
+        print("\n[2/4] Checking USDC (Circle) blacklist...")
         for addr in ADDRESSES_TO_CHECK:
             try:
                 result = await check_usdc_blacklist(session, rpc, addr)
@@ -180,9 +234,28 @@ async def main():
             except Exception as e:
                 print(f"  {addr[:12]}... | ERROR: {e}")
         
+        # Check Aave market status + Exploiter 2 deposit
+        print("\n[3/4] Checking Aave V3 market status + Exploiter 2 deposit...")
+        usdt_paused = await get_aave_reserve_paused(session, rpc, USDT_CONTRACT)
+        usdc_paused = await get_aave_reserve_paused(session, rpc, USDC_CONTRACT)
+        print(f"  Aave USDT market: {'PAUSED 🚨' if usdt_paused else 'ACTIVE'}")
+        print(f"  Aave USDC market: {'PAUSED 🚨' if usdc_paused else 'ACTIVE'}")
+        
+        exploiter2 = "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c"
+        aave_data = await check_aave_deposit(session, rpc, exploiter2)
+        print(f"  Exploiter 2 aUSDT: {aave_data['aUSDT']:,.2f}")
+        print(f"  Exploiter 2 aUSDC: {aave_data['aUSDC']:,.2f}")
+        print(f"  Exploiter 2 USDT allowance to LendingPool: {aave_data['usdt_allowance']:,}")
+        print(f"  Exploiter 2 USDC allowance to LendingPool: {aave_data['usdc_allowance']:,}")
+        if aave_data["deposited"]:
+            print("  !!! AAVE DEPOSIT DETECTED - HACKER MAY BE BORROWING ETH!")
+        elif aave_data["allowance_set"]:
+            print("  !!! AAVE ALLOWANCE SET - DEPOSIT IMMINENT!")
+        else:
+            print("  OK No Aave deposit or allowance detected")
+        
         # Check other token balances
-        print("\n[3/3] Checking other token balances on Exploiter 2...")
-        exploiter2 = "0x5227...CB2f8c"
+        print("\n[4/4] Checking other token balances on Exploiter 2...")
         for token_name, (contract, decimals) in OTHER_TOKENS.items():
             if contract == "0x...":
                 continue

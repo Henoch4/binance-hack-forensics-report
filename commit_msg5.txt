@@ -1,0 +1,10 @@
+Major update: Live Binance 16 drain, image-confirmed details, cross-chain expansion
+
+- Binance 16 draining LIVE: 849 ETH -> 0.21 ETH (22:54-23:01 UTC)
+- Exploiter 2 at 20 txs, downstream movement ongoing
+- Exploiter 3: 195,460 ETH, 0 txs out (CRITICAL watch)
+- Image-confirmed: Binance 16 9 transfers, 43M extra USDC, RLUSD evasion
+- Cross-chain: Arbitrum, Avalanche, Optimism, BTC, TRON added
+- RLUSD freeze check added to task list
+- Updated all address balances from live polling
+- Updated timeline with live events through Oct 30

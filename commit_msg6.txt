@@ -1,0 +1,7 @@
+Add Aave V3 borrow window watcher
+
+- background_poll.py: Aave reserve pause check + aToken balance + allowance monitoring
+- quick_poll.py: One-shot Aave borrow window check
+- freeze_check.py: Aave market status + Exploiter 2 deposit detection
+- Detects if hacker deposits stolen USDT/USDC to Aave to borrow unfreezable ETH
+- Alerts on allowance set (pre-deposit) and actual deposit

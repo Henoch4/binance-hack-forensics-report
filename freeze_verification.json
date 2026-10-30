@@ -4,8 +4,8 @@
       "address": "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c",
       "token": "USDT",
       "blacklisted": false,
-      "balance": 1175464711.075362,
-      "balance_raw": 1175464711075362
+      "balance": 1175464712.875462,
+      "balance_raw": 1175464712875462
     },
     {
       "address": "0x8532...43D4",
@@ -39,8 +39,8 @@
       "address": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
       "token": "USDT",
       "blacklisted": false,
-      "balance": 626392.515648,
-      "balance_raw": 626392515648
+      "balance": 0.200648,
+      "balance_raw": 200648
     },
     {
       "address": "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
